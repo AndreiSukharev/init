@@ -1,0 +1,5 @@
+tail -f /var/log/syslog &
+pkill tail
+or
+jobs -l
+kill PID

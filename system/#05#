@@ -1,0 +1,231 @@
+
+Tip
+
+Install SSH server:
+
+apt-get install openssh-server
+
+06. Name the command that reboots the SSH service.
+
+Answer
+
+service ssh restart
+
+07. Figure out the PID of the SSHD service.
+
+Answer
+
+cat /var/run/sshd.pid
+
+08. What file contains the RSA keys that are authorized to connect via SSH?
+
+Answer
+
+~/.ssh/authorized_keys
+
+Explanation
+
+The file contains public keys for public key authentication.
+
+09. What command lets you know who is connected to the System?
+
+Answer
+
+who
+
+Explanation
+
+man who:
+
+Print information about users who are currently logged in.
+10. Name the command that lists the partition tables of external devices?
+
+Answer
+
+fdisk -l
+
+Explanation
+
+man fdisk:
+
+-l, --list œôòô List the partition tables for the specified devices and then exit. If no devices are given, those mentioned in /proc/partitions (if that exists) are used.
+11. Name the command that displays the available space left on the system?
+
+Answer
+
+df -h --total
+
+Explanation
+
+man df:
+
+df œôòô report file system disk space usage.
+-h, --human-readable œôòô Print sizes in powers of 1024 (e.g., 1023M).
+--total œôòô Elide all entries insignificant to available space, and produce a grand total.
+12. Figure out the exact size of each folder of /var
+
+Answer
+
+du -sh /var/*
+
+Explanation
+
+du œôòô estimate file space usage.
+Summarize disk usage of each FILE, recursively for directories.
+-s, --summarize œôòô Display only a total for each argument.
+-h, --human-readable œôòô Print sizes in human readable format (e.g., 1K 234M 2G).
+Alternative answers
+
+du -hd0 /var/*
+
+du -h --max-depth=0 /var/*
+
+Explanation
+
+-d, --max-depth=N œôòô Print the total for a directory (or file, with --all) only if it is N or fewer levels below the command line argument; --max-depth=0 is the same as --summarize.
+13. Name the command that find currently running processes.
+
+Answer
+
+ps aux
+
+14. Run the œôòøtail -f /var/log/syslogœôòø command in background.
+
+Answer
+
+tail -f /var/log/syslog &
+
+Explanation
+
+Running Bash Commands in the Background the Right Way [Linux]:
+
+If you want to push a command into the background, using & at the end is an easy way to do that. It comes with a catch, though. Using & doesnœôòùt disconnect the command away from you; it just pushes it in the background so you can continue using a terminal.
+
+command &
+When the terminal session is closed, the command ends. Using & is good if you need to push something off for a bit, but donœôòùt expect it to continue forever.
+15. Find the command that kills the background commandœôòùs process.
+
+Answer
+
+pkill tail
+
+Explanation
+
+The pkill command allows to kill a program by specifying the full name or partial name.
+
+Alternative answer
+
+kill %<job number>
+
+Explanation
+
+Instead of <job number> we need to place job number of process, which we want to kill.
+
+Alternative answer
+
+kill <PID>
+
+Explanation
+
+How do I run a Unix process in the background?:
+
+You can kill a background process by entering:
+
+kill PID
+Replace PID with the process ID of the job. If that fails, enter the following:
+
+kill -KILL PID
+kill(1) - Linux man page:
+
+The command kill sends the specified signal to the specified process or process group. If no signal is specified, the TERM signal is sent. The TERM signal will kill processes which do not catch this signal. For other processes, it may be necessary to use the KILL (9) signal, since this signal cannot be caught.
+If we want to do it this way, first of all we need to know PID of process. jobs -l will help us.
+
+Linux 2.6 - man page for jobs (linux section 1):
+
+jobs œôòô display status of jobs in the current session.
+-l œôòô Provide more information about each job listed. This information shall include the job number, current job, process group ID, state, and the command that formed the job.
+16. Find the service which makes it possible to run specific tasks following a regular schedule.
+
+Answer
+
+cron
+
+Explanation
+
+man cron:
+
+cron œôòô daemon to execute scheduled commands.
+17. Find the command which gives the list of firewall rules.
+
+Answer
+
+iptables -L
+
+Note
+
+You must be root to run this command.
+
+Explanation
+
+iptables(8) - Linux man page:
+
+iptables œôòô administration tool for IPv4 packet filtering and NAT.
+-L, --list [chain] œôòô List all rules in the selected chain. If no chain is selected, all chains are listed.
+18. With the previous command, authorize only IP addresses from 10.0.0.0/8 to connect to your system.
+
+Types of chains
+
+The Beginnerœôòùs Guide to iptables, the Linux Firewall:
+
+iptables uses three different chains: input, forward, and output.
+Input œôòó This chain is used to control the behavior for incoming connections. For example, if a user attempts to SSH into your PC/server, iptables will attempt to match the IP address and port to a rule in the input chain.
+Forward œôòó This chain is used for incoming connections that arenœôòùt actually being delivered locally. Think of a router œôòó data is always being sent to it but rarely actually destined for the router itself; the data is just forwarded to its target. Unless youœôòùre doing some kind of routing, NATing, or something else on your system that requires forwarding, you wonœôòùt even use this chain.
+Output œôòó This chain is used for outgoing connections. For example, if you try to ping howtogeek.com, iptables will check its output chain to see what the rules are regarding ping and howtogeek.com before making a decision to allow or deny the connection attempt.
+Even though pinging an external host seems like something that would only need to traverse the output chain, keep in mind that to return the data, the input chain will be used as well. When using iptables to lock down your system, remember that a lot of protocols will require two-way communication, so both the input and output chains will need to be configured properly. SSH is a common protocol that people forget to allow on both chains.
+Policy chain default behavior
+
+More times than not, youœôòùll want your system to accept connections by default. Unless youœôòùve changed the policy chain rules previously, this setting should already be configured. Either way, hereœôòùs the command to accept connections by default:
+
+iptables --policy INPUT ACCEPT
+iptables --policy OUTPUT ACCEPT
+iptables --policy FORWARD ACCEPT
+If you would rather deny all connections and manually specify which ones you want to allow to connect, you should change the default policy of your chains to drop. Doing this would probably only be useful for servers that contain sensitive information and only ever have the same IP addresses connect to them.
+
+iptables --policy INPUT DROP
+iptables --policy OUTPUT DROP
+iptables --policy FORWARD DROP
+Connection-specific responses
+
+Accept œôòó Allow the connection.
+Drop œôòó Drop the connection, act like it never happened. This is best if you donœôòùt want the source to realize your system exists.
+Reject œôòó Donœôòùt allow the connection, but send back an error. This is best if you donœôòùt want a particular source to connect to your system, but you want them to know that your firewall blocked them.
+Answer
+
+iptables -A INPUT -s 10.0.0.0/8 -j ACCEPT
+iptables -A OUTPUT -d 10.0.0.0/8 -j ACCEPT
+Explanation
+
+man iptables:
+
+-A, --append chain rule-specification œôòô Append one or more rules to the end of the selected chain. When the source and/or destination names resolve to more than one address, a rule will be added for each possible address combination.
+-j, --jump target œôòô This specifies the target of the rule; i.e., what to do if the packet matches it. The target can be a user-defined chain (other than the one this rule is in), one of the special builtin targets which decide the fate of the packet immediately, or an extension (see EXTENSIONS below). If this option is omitted in a rule (and -g is not used), then matching the rule will have no effect on the packet's fate, but the counters on the rule will be incremented.
+[!] -s, --source address[/mask][,...] œôòô Source specification. Address can be either a network name, a hostname, a network IP address (with /mask), or a plain IP address. Hostnames will be resolved once only, before the rule is submitted to the kernel. Please note that specifying any name to be resolved with a remote query such as DNS is a really bad idea. The mask can be either an ipv4 network mask (for iptables) or a plain number, specifying the number of 1's at the left side of the network mask. Thus, an iptables mask of 24 is equivalent to 255.255.255.0. A "!" argument before the address specification inverts the sense of the address. The flag --src is an alias for this option. Multiple addresses can be specified, but this will expand to multiple rules (when adding with -A), or will cause multiple rules to be deleted (with -D).
+[!] -d, --destination address[/mask][,...] œôòô Destination specification. See the description of the -s(source) flag for a detailed description of the syntax. The flag --dst is an alias for this option.
+19. With the previous command, forbid all others.
+
+Answer
+
+iptables -P INPUT DROP
+iptables -P OUTPUT DROP
+Explanation
+
+man iptables:
+
+-P, --policy chain target œôòô Set the policy for the built-in (non-user-defined) chain to the given target. The policy target must be either ACCEPT or DROP.
+ Pages 3
+
+Network
+Scripting
+System
+Clone this wiki locally
+
